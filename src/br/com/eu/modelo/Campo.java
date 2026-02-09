@@ -2,8 +2,7 @@ package br.com.eu.modelo;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import br.com.eu.excecao.ExplosaoException;
+import java.util.function.BiConsumer;
 
 public class Campo {
 
@@ -14,11 +13,20 @@ public class Campo {
 	private boolean aberto = false;
 	private boolean marcado = false;
 
-	private List<Campo> vizinhos = new ArrayList<Campo>();
+	private List<Campo> vizinhos = new ArrayList<>();
+	private List<CampoObservador> observadores = new ArrayList<>();
 
 	Campo(int linha, int coluna) {
 		this.linha = linha;
 		this.coluna = coluna;
+	}
+	
+	public void registrarObservador(CampoObservador observador) {
+		observadores.add(observador);
+	}
+	
+	private void notificarObservadores(CampoEvento evento) {
+		observadores.stream().forEach(o -> o.ocorreuEvento(this, evento));
 	}
 
 	boolean adicionarVizinho(Campo possivelVizinho) {
@@ -45,6 +53,12 @@ public class Campo {
 	void alternarMarcacao() {
 		if (!aberto) {
 			marcado = !marcado;
+			
+			if(marcado) {
+				notificarObservadores(CampoEvento.MARCAR);
+			}  else {
+				notificarObservadores(CampoEvento.DESMARCAR);
+			}
 		}
 	}
 
@@ -53,9 +67,11 @@ public class Campo {
 			aberto = true;
 
 			if (minado) {
-				throw new ExplosaoException();
+				notificarObservadores(CampoEvento.EXPLODIR);
+				return true;
 			}
-
+			setAberto(true);
+			
 			if (vizinhancaSegura()) {
 				vizinhos.forEach(v -> v.abrir());
 			}
@@ -85,6 +101,10 @@ public class Campo {
 	
 	void setAberto(boolean aberto) {
 		this.aberto = aberto;
+		
+		if(aberto) {
+			notificarObservadores(CampoEvento.ABRIR);
+		}
 	}
 
 	public boolean isAberto() {
@@ -118,18 +138,5 @@ public class Campo {
 		minado = false;
 		marcado = false;
 	}
-	
-	public String toString() {
-		if(marcado) {
-			return "🚩";
-		} else if (aberto && minado) {
-			return "💣";
-		} else if(aberto && minasNaVizinhanca() > 0) {
-			return Long.toString(minasNaVizinhanca());
-		} else if(aberto) {
-			return " ";
-		} else {
-			return "■";
-		}
-	}
 }
+	
