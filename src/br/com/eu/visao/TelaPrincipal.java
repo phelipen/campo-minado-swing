@@ -13,7 +13,7 @@ public class TelaPrincipal extends JFrame {
 
 	public TelaPrincipal() {
 		setLayout(new BorderLayout());
-		Tabuleiro tabuleiro = new Tabuleiro(16, 30, 50);
+		Tabuleiro tabuleiro = new Tabuleiro(16, 30, 4);
 		
 		PainelTemporizador temporizador = new PainelTemporizador(300);
 		
