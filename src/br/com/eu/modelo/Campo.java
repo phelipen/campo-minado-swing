@@ -17,7 +17,7 @@ public class Campo {
 	// Lista de campos vizinhos
 	private List<Campo> vizinhos = new ArrayList<>();
 	
-	// Lista de observadores (ex: interface gráfica, tabuleiro, etc)
+	// Lista de observadores 
 	private List<CampoObservador> observadores = new ArrayList<>();
 
 	// Construtor recebe a posição do campo
